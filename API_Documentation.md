@@ -17,7 +17,7 @@ Production: https://your-domain.com/api
     *Select Fly_Connect_Sky_API.postman_collection.json
 
 2. Set Environment Variables:
-    *Set base_url to your API endpoint (e.g., http://localhost:5000/api)
+    *Set base_url to your API endpoint (http://localhost:5000/api)
     *Login to get a JWT token and set auth_token
     
 3. Test Endpoints:
