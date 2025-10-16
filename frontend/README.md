@@ -37,7 +37,7 @@ A modern, responsive React application for flight booking and management built w
 
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
+   git clone <https://github.com/luffy229/flite-management-system.git>
    cd fly-connect-sky/frontend
    ```
 
