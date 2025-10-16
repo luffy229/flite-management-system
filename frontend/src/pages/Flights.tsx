@@ -117,7 +117,7 @@ const Flights = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div className="space-y-2 sm:col-span-1">
+              <div className="space-y-2">
                 <Label htmlFor="origin">From</Label>
                 <Input
                   id="origin"
@@ -131,7 +131,7 @@ const Flights = () => {
                 <p className="text-xs text-muted-foreground text-center">3-letter code</p>
               </div>
               
-              <div className="space-y-2 sm:col-span-1">
+              <div className="space-y-2">
                 <Label htmlFor="destination">To</Label>
                 <Input
                   id="destination"
@@ -145,7 +145,7 @@ const Flights = () => {
                 <p className="text-xs text-muted-foreground text-center">3-letter code</p>
               </div>
 
-              <div className="space-y-2 sm:col-span-2 lg:col-span-1">
+              <div className="space-y-2">
                 <Label htmlFor="date">Travel Date</Label>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -160,7 +160,7 @@ const Flights = () => {
                 </div>
               </div>
 
-              <div className="space-y-2 sm:col-span-2 lg:col-span-1">
+              <div className="space-y-2">
                 <Label htmlFor="passengers">Passengers</Label>
                 <Input
                   id="passengers"
@@ -173,7 +173,7 @@ const Flights = () => {
                 />
               </div>
 
-              <div className="flex flex-col justify-end sm:col-span-2 lg:col-span-1">
+              <div className="space-y-2">
                 <Label className="invisible">Search</Label>
                 <Button 
                   onClick={handleSearch} 
@@ -274,6 +274,7 @@ const Flights = () => {
         }}
         selectedDate={selectedDate}
         userEmail={user?.email || ""}
+        passengers={passengers}
       />
     </div>
   );

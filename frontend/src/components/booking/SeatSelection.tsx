@@ -10,17 +10,25 @@ interface SeatSelectionProps {
   loading: boolean;
   onConfirm: (seats: string[]) => void;
   onCancel: () => void;
+  maxSeats: number;
 }
 
-export const SeatSelection = ({ flight, seatMap, loading, onConfirm, onCancel }: SeatSelectionProps) => {
+export const SeatSelection = ({ flight, seatMap, loading, onConfirm, onCancel, maxSeats }: SeatSelectionProps) => {
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   
   const toggleSeat = (seatNumber: string) => {
-    setSelectedSeats(prev => 
-      prev.includes(seatNumber) 
-        ? prev.filter(s => s !== seatNumber)
-        : [...prev, seatNumber]
-    );
+    setSelectedSeats(prev => {
+      if (prev.includes(seatNumber)) {
+        // If seat is already selected, remove it
+        return prev.filter(s => s !== seatNumber);
+      } else {
+        // If seat is not selected, only add it if we haven't reached the max limit
+        if (prev.length < maxSeats) {
+          return [...prev, seatNumber];
+        }
+        return prev; // Don't add if we've reached the limit
+      }
+    });
   };
 
   const getTotalPrice = () => {
@@ -76,20 +84,24 @@ export const SeatSelection = ({ flight, seatMap, loading, onConfirm, onCancel }:
                       {seats.map(seat => {
                         const isOccupied = seat.isOccupied;
                         const isSelected = selectedSeats.includes(seat.seatNumber);
+                        const isDisabled = isOccupied || (!isSelected && selectedSeats.length >= maxSeats);
                         
                         return (
                           <button
                             key={seat.seatNumber}
                             onClick={() => toggleSeat(seat.seatNumber)}
-                            disabled={isOccupied}
+                            disabled={isDisabled}
                             className={cn(
                               "w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-all duration-200 transform hover:scale-105",
                               "border-2 shadow-sm",
                               isOccupied && "bg-red-50 border-red-200 text-red-400 cursor-not-allowed hover:scale-100",
-                              !isOccupied && !isSelected && "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100 hover:border-gray-300",
+                              !isOccupied && !isSelected && !isDisabled && "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100 hover:border-gray-300",
+                              !isOccupied && !isSelected && isDisabled && "bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed hover:scale-100",
                               isSelected && "bg-blue-500 border-blue-500 text-white shadow-lg hover:bg-blue-600"
                             )}
-                            title={`Seat ${seat.seatNumber}`}
+                            title={isOccupied ? `Seat ${seat.seatNumber} - Occupied` : 
+                                   isDisabled ? `Seat ${seat.seatNumber} - Maximum seats selected` : 
+                                   `Seat ${seat.seatNumber}`}
                           >
                             {isOccupied ? (
                               <User className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -154,22 +166,27 @@ export const SeatSelection = ({ flight, seatMap, loading, onConfirm, onCancel }:
       {renderSeatMap()}
 
       {/* Selection Summary */}
-      {selectedSeats.length > 0 && (
-        <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 sm:p-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-            <div className="flex-1">
-              <p className="font-medium text-sm sm:text-base">Selected Seats: {selectedSeats.length}</p>
-              <p className="text-xs sm:text-sm text-muted-foreground break-all">
-                {selectedSeats.join(', ')}
+      <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex-1">
+            <p className="font-medium text-sm sm:text-base">
+              Selected Seats: {selectedSeats.length} / {maxSeats}
+            </p>
+            <p className="text-xs sm:text-sm text-muted-foreground break-all">
+              {selectedSeats.length > 0 ? selectedSeats.join(', ') : 'No seats selected yet'}
+            </p>
+            {selectedSeats.length < maxSeats && (
+              <p className="text-xs text-muted-foreground mt-1">
+                You can select {maxSeats - selectedSeats.length} more seat{maxSeats - selectedSeats.length !== 1 ? 's' : ''}
               </p>
-            </div>
-            <div className="text-left sm:text-right">
-              <p className="text-xs sm:text-sm text-muted-foreground">Total Price</p>
-              <p className="text-base sm:text-lg font-bold">₹{getTotalPrice()}</p>
-            </div>
+            )}
+          </div>
+          <div className="text-left sm:text-right">
+            <p className="text-xs sm:text-sm text-muted-foreground">Total Price</p>
+            <p className="text-base sm:text-lg font-bold">₹{getTotalPrice()}</p>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Actions */}
       <div className="flex flex-col sm:flex-row justify-end gap-3">
@@ -178,11 +195,13 @@ export const SeatSelection = ({ flight, seatMap, loading, onConfirm, onCancel }:
         </Button>
         <Button 
           onClick={() => onConfirm(selectedSeats)}
-          disabled={selectedSeats.length === 0}
+          disabled={selectedSeats.length === 0 || selectedSeats.length !== maxSeats}
           className="w-full sm:w-auto"
         >
-          <span className="hidden sm:inline">Continue ({selectedSeats.length} seat{selectedSeats.length !== 1 ? 's' : ''})</span>
-          <span className="sm:hidden">Continue ({selectedSeats.length})</span>
+          <span className="hidden sm:inline">
+            Continue ({selectedSeats.length}/{maxSeats} seat{maxSeats !== 1 ? 's' : ''})
+          </span>
+          <span className="sm:hidden">Continue ({selectedSeats.length}/{maxSeats})</span>
         </Button>
       </div>
     </div>

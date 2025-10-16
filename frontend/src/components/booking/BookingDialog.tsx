@@ -14,6 +14,7 @@ interface BookingDialogProps {
   onClose: () => void;
   selectedDate: string;
   userEmail: string;
+  passengers: number;
 }
 
 export interface PassengerDetails {
@@ -32,7 +33,7 @@ export interface BookingData {
   bookingReference: string;
 }
 
-export const BookingDialog = ({ flight, open, onClose, selectedDate, userEmail }: BookingDialogProps) => {
+export const BookingDialog = ({ flight, open, onClose, selectedDate, userEmail, passengers: passengerCount }: BookingDialogProps) => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
@@ -156,6 +157,7 @@ export const BookingDialog = ({ flight, open, onClose, selectedDate, userEmail }
             loading={loadingSeats}
             onConfirm={handleSeatConfirm}
             onCancel={handleClose}
+            maxSeats={passengerCount}
           />
         )}
 
